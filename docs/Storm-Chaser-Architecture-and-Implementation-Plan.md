@@ -256,6 +256,8 @@ StormRecord
 WeatherSnapshot
 - temperatureCelsius: number
 - apparentTemperatureCelsius: number | null
+- relativeHumidityPercent: number | null
+- surfacePressureHpa: number | null
 - precipitationMm: number
 - windSpeedKph: number
 - windGustKph: number | null
@@ -265,7 +267,7 @@ WeatherSnapshot
 - source: "live" | "cache"
 ```
 
-The snapshot is stored with the storm. Historical records must not display whatever the current weather happens to be when reopened.
+The snapshot is stored with the storm. Relative humidity and surface pressure are part of that persisted immutable snapshot when available. Historical records must not display whatever the current weather happens to be when reopened.
 
 ### 7.3 Storm classification
 
@@ -321,12 +323,12 @@ Initial tables:
 - `storm_type`
 - `notes`
 - `observed_conditions`
-- Weather snapshot columns, nullable where appropriate
+- Weather snapshot columns, including nullable `relative_humidity_percent` and `surface_pressure_hpa`
 
 #### `weather_cache`
 
 - Cache key derived from rounded coordinates
-- Weather fields
+- Weather fields, including nullable `relative_humidity_percent` and `surface_pressure_hpa`
 - Observation timestamp
 - Cache timestamp
 
@@ -375,6 +377,8 @@ Display at minimum:
 
 - Temperature
 - Apparent temperature where available
+- Relative humidity where available
+- Surface pressure where available
 - Wind speed
 - Wind gusts where available
 - Wind direction where available
@@ -382,11 +386,27 @@ Display at minimum:
 - Interpreted weather condition
 - Observation/update time
 
-### 9.2 Query identity
+### 9.2 Open-Meteo current-weather request and mapping
+
+Request these Open-Meteo current-weather variables:
+
+- `temperature_2m`
+- `apparent_temperature`
+- `relative_humidity_2m`
+- `surface_pressure`
+- `precipitation`
+- `wind_speed_10m`
+- `wind_gusts_10m`
+- `wind_direction_10m`
+- `weather_code`
+
+Map `relative_humidity_2m` to `relativeHumidityPercent` and `surface_pressure` to `surfacePressureHpa`. Treat both fields as nullable at the domain boundary: a missing, null, or invalid transport value maps to `null`, not a fabricated default.
+
+### 9.3 Query identity
 
 Weather query keys should include rounded coordinates to prevent tiny GPS changes from creating excessive cache entries.
 
-### 9.3 Weather states
+### 9.4 Weather states
 
 The UI must distinguish:
 
@@ -400,11 +420,11 @@ The UI must distinguish:
 - Network/server failure
 - Retry in progress
 
-### 9.4 Not-found requirement
+### 9.5 Not-found requirement
 
 Provide an explicit **Weather not found** state when no usable weather can be retrieved. Do not mislabel every failure as not found.
 
-### 9.5 Forecast condition
+### 9.6 Forecast condition
 
 Forecast work begins only after:
 
@@ -575,11 +595,11 @@ Use Jest and React Native Testing Library.
 
 Prioritize:
 
-- Open-Meteo response mapping
+- Open-Meteo response mapping, including relative humidity and surface pressure mappings and nullable-value handling
 - Weather-code interpretation
 - Storm validation
-- Database row/domain mapping
-- Weather snapshot creation
+- Database row/domain mapping, including nullable snapshot relative humidity and surface pressure
+- Weather snapshot creation, including immutable relative humidity and surface pressure values
 - Query-key coordinate rounding
 - Repository cleanup behaviour where practical
 
@@ -715,16 +735,16 @@ Codex must implement only the milestone explicitly authorized in the active prom
 - Open-Meteo client and response types
 - Domain weather model and mapper
 - Current-weather query hook
-- Weather metric components
+- Weather metric components for temperature, relative humidity, surface pressure, wind, and precipitation
 - Loading, success, not-found, permission, and retry states
 - Pull-to-refresh
-- Weather mapper tests
+- Weather mapper tests covering relative humidity and surface pressure mappings, including missing and invalid nullable values
 
 **Acceptance criteria:**
 
 - Location permission can be approved or denied safely.
 - Current coordinates can be acquired.
-- Temperature, wind, and precipitation render.
+- Temperature, relative humidity, surface pressure, wind, and precipitation render.
 - Loading and refresh states are visible.
 - Weather not found is explicitly represented.
 - Network and permission errors remain distinct.
