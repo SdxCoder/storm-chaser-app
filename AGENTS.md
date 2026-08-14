@@ -137,6 +137,7 @@ Run the smallest relevant test target during iteration, then the full required c
 - State the expected files and scope before a broad change.
 - Make the smallest coherent change that satisfies the active milestone.
 - Do not begin a later milestone automatically.
+- Keep the architecture plan’s Execution Status table accurate, but do not mark a milestone Completed until its required manual and device checks are confirmed.
 - Keep `docs/AI_USAGE.md` and `docs/TIME_LOG.md` current as work proceeds.
 - Review the diff for unrelated changes, secrets, generated artifacts, and dead code before committing.
 - Do not commit or push unless the user explicitly authorizes it.

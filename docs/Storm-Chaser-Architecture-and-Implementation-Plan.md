@@ -28,6 +28,40 @@ Functionality, correctness, failure handling, readable code, testing, and docume
 
 ---
 
+## Execution Status
+
+| Milestone | Status | Verification |
+|---|---|---|
+| 0 — Planning and scope control | Completed | Architecture, scope, stack and repository guidance established |
+| 1 — Repository and application foundation | Completed | Repository records document foundation verification, but retain no command pass output; physical-device validation remains outstanding |
+| 2 — Current weather vertical slice | Not started | — |
+| 3 — Storm capture and metadata | Not started | — |
+| 4 — Persistence, Storm Log, and detail | Not started | — |
+| 5 — Offline behaviour and dark mode | Not started | — |
+| 6 — Conditional forecast | Not started | — |
+| 7 — Test completion, accessibility, and documentation | Not started | — |
+| 8 — Cross-platform QA and submission | Not started | — |
+
+Allowed status values:
+
+- `Not started`
+- `In progress`
+- `Implemented — device verification pending`
+- `Completed`
+- `Deferred`
+- `Excluded`
+
+Tracking rules:
+
+- A milestone becomes `In progress` when its implementation begins.
+- Codex may mark a milestone `Implemented — device verification pending` after implementation and automated verification.
+- A milestone becomes `Completed` only after its acceptance criteria and required manual/device checks have been verified.
+- Status updates must include verification evidence.
+- Do not mark later milestones as started merely because supporting code was introduced by an earlier approved milestone.
+- Only update milestone status as part of an explicitly authorized milestone or documentation task.
+
+---
+
 ## 2. Locked Decisions
 
 | Area | Decision |
@@ -1075,4 +1109,3 @@ Codex must not begin a later milestone automatically.
 - [TanStack Query for React Native](https://tanstack.com/query/latest/docs/framework/react/react-native)
 - [Bulletproof React project structure](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md)
 - [React Native testing overview](https://reactnative.dev/docs/testing-overview)
-
