@@ -4,6 +4,21 @@ import { CaptureScreen } from '../src/features/storms/screens/capture-screen';
 import { StormLogScreen } from '../src/features/storms/screens/storm-log-screen';
 import { WeatherScreen } from '../src/features/weather/screens/weather-screen';
 
+jest.mock('../src/features/weather/hooks/use-current-weather-flow', () => ({
+  useCurrentWeatherFlow: () => ({
+    location: { status: 'loading' },
+    requestLocation: jest.fn(),
+    weather: {
+      data: undefined,
+      failureCount: 0,
+      isError: false,
+      isPending: true,
+      isRefetching: false,
+      refetch: jest.fn(),
+    },
+  }),
+}));
+
 describe('application shell', () => {
   it.each([
     ['Weather', WeatherScreen],

@@ -34,7 +34,7 @@ Functionality, correctness, failure handling, readable code, testing, and docume
 |---|---|---|
 | 0 — Planning and scope control | Completed | Architecture, scope, stack and repository guidance established |
 | 1 — Repository and application foundation | Completed | Repository records document foundation verification, but retain no command pass output; physical-device validation remains outstanding |
-| 2 — Current weather vertical slice | Not started | — |
+| 2 — Current weather vertical slice | Completed | `npm run typecheck`, `npm run lint`, 35 Jest tests, and Expo Doctor pass; user confirmed permission approval/denial, location acquisition, live weather, refresh, network recovery, and light/dark mode on a physical iOS device |
 | 3 — Storm capture and metadata | Not started | — |
 | 4 — Persistence, Storm Log, and detail | Not started | — |
 | 5 — Offline behaviour and dark mode | Not started | — |
