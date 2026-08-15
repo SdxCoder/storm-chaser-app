@@ -232,11 +232,12 @@ Storm details open as a pushed route outside the tab list.
 flowchart TD
     A["Retrieve location"] --> B["Load current weather"]
     B --> C["Capture storm photo"]
-    C --> D["Copy photo to durable storage"]
+    C --> D["Retain temporary photo in draft and show preview"]
     D --> E["Complete storm metadata"]
-    E --> F["Save storm record"]
-    F --> G["View Storm Log"]
-    G --> H["Open storm details"]
+    E --> F["Confirm Save and copy photo to durable storage"]
+    F --> G["Save storm record with durable photo URI"]
+    G --> H["View Storm Log"]
+    H --> I["Open storm details"]
 ```
 
 The weather and documentation features must feel connected. Weather, coordinates, and timestamp should be prefilled wherever available rather than requiring duplicate manual entry.
@@ -389,6 +390,8 @@ sequenceDiagram
         UI->>Files: Remove orphaned copied photo
     end
 ```
+
+Do not delete the temporary source photo until the save workflow no longer requires it.
 
 ### 8.4 Deletion behaviour
 
@@ -810,7 +813,7 @@ Codex must implement only the milestone explicitly authorized in the active prom
 - Camera permission and system-camera launch
 - Cancellation handling
 - Photo preview
-- Durable photo-copy service
+- Temporary captured-photo draft state and preview
 - Storm model and validation
 - React Hook Form metadata workflow
 - Automatic weather, coordinate, and timestamp prefill
@@ -821,10 +824,12 @@ Codex must implement only the milestone explicitly authorized in the active prom
 - Camera permission approval and denial are handled.
 - User cancellation returns safely.
 - Captured photo is previewed.
-- The temporary photo is copied into app-owned storage.
+- The temporary photo URI remains available in the in-memory draft and is previewed without creating a permanent file.
 - Required metadata is populated or entered.
 - Invalid form submission is blocked with useful messages.
 - Draft state survives recoverable form errors.
+
+**Boundary:** Abandoning or cancelling a draft must not leave an app-owned permanent photo.
 
 **Explicitly excluded:** Database save, Storm Log, forecast, map, cloud.
 
@@ -853,11 +858,18 @@ Codex must implement only the milestone explicitly authorized in the active prom
 - Storm detail screen
 - Invalid/missing-record state
 - Query invalidation after save
+- On Save confirmation, copy the temporary photo into app-owned durable storage
+- SQLite insert using the durable photo URI
 - Orphaned-photo cleanup after failed insert
+- Temporary source retention until the save workflow no longer requires it
 
 **Acceptance criteria:**
 
 - Complete storm record saves locally.
+- When the user confirms Save, the temporary photo is copied into app-owned durable storage.
+- The SQLite record is inserted using the durable photo URI.
+- If the database insert fails, the newly copied orphaned photo is deleted.
+- The temporary source is not deleted until the save workflow no longer requires it.
 - Duplicate Save taps are prevented.
 - Storm appears in the log after saving.
 - Storm detail displays photo and all metadata.
