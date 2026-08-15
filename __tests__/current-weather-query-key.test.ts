@@ -10,7 +10,13 @@ describe('current weather query identity', () => {
   });
 
   it('uses rounded coordinates in the query key', () => {
-    expect(currentWeatherQueryKey({ latitude: 51.044733, longitude: -114.071912 })).toEqual([
+    expect(
+      currentWeatherQueryKey({
+        latitude: 51.044733,
+        longitude: -114.071912,
+        locationAccuracyMetres: 10,
+      }),
+    ).toEqual([
       'current-weather',
       51.045,
       -114.072,

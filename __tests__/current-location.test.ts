@@ -55,7 +55,11 @@ describe('acquireCurrentLocation', () => {
 
     await expect(acquireCurrentLocation()).resolves.toEqual({
       status: 'success',
-      coordinates: { latitude: 51.0447, longitude: -114.0719 },
+      coordinates: {
+        latitude: 51.0447,
+        longitude: -114.0719,
+        locationAccuracyMetres: 10,
+      },
     });
     expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
   });

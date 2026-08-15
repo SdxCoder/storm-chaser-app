@@ -19,6 +19,30 @@ jest.mock('../src/features/weather/hooks/use-current-weather-flow', () => ({
   }),
 }));
 
+jest.mock('../src/features/storms/hooks/use-storm-draft', () => ({
+  useStormDraft: () => ({
+    camera: { status: 'idle' },
+    draft: {
+      temporaryPhotoUri: '',
+      capturedAt: '',
+      latitude: null,
+      longitude: null,
+      locationAccuracyMetres: null,
+      weatherSnapshot: null,
+    },
+    location: { status: 'idle' },
+    requestCamera: jest.fn(),
+    requestLocation: jest.fn(),
+    weather: {
+      data: undefined,
+      isError: false,
+      isPending: false,
+      isRefetching: false,
+      refetch: jest.fn(),
+    },
+  }),
+}));
+
 describe('application shell', () => {
   it.each([
     ['Weather', WeatherScreen],

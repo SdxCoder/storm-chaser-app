@@ -130,7 +130,11 @@ Run the smallest relevant test target during iteration, then the full required c
 - Do not create interfaces that only mirror one trivial implementation unless they enable a concrete test or boundary.
 - Do not refactor unrelated stable code while implementing a milestone.
 - Do not add a dependency without explaining its need and confirming the existing stack cannot solve the problem cleanly.
-- Prefer the narrowest ownership scope: keep one-off helpers colocated with the component or feature that owns their policy, and extract shared utilities only after genuine reuse with the same semantics.
+- Prefer the narrowest ownership scope: keep one-off helpers colocated with the component or feature that owns their policy.
+- Keep feature-specific components, hooks, services, models and presentation helpers inside their owning feature. Move code to global shared directories only after genuine cross-feature reuse or an explicitly approved cross-feature service boundary.
+- Separate substantial external-platform integration, form orchestration and stateful workflows from screen presentation when they have independent responsibilities. Use focused feature-local services and hooks, while keeping screens centered on workflow composition.
+- Do not create catch-all screen-controller hooks that merely move an entire screen’s complexity into another file. Each extracted hook or service must have a cohesive responsibility and a clear reason to change.
+- Decompose screens into cohesive feature-local components when they contain multiple substantial UI sections or state-specific rendering branches. Keep screen files focused on orchestration and composition. Place single-feature components under that feature’s `components/` directory, and promote them to global `src/components/` only after genuine cross-feature reuse. Do not split trivial wrappers solely to reduce line count.
 
 ## Working Rules
 

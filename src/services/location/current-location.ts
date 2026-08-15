@@ -3,6 +3,7 @@ import * as Location from 'expo-location';
 export type DeviceCoordinates = {
   latitude: number;
   longitude: number;
+  locationAccuracyMetres: number | null;
 };
 
 export type CurrentLocationResult =
@@ -56,12 +57,22 @@ export async function acquireCurrentLocation(
     const position = await withTimeout(
       Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
     );
-    const { latitude, longitude } = position.coords;
+    const { accuracy, latitude, longitude } = position.coords;
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
       return { status: 'unavailable' };
     }
 
-    return { status: 'success', coordinates: { latitude, longitude } };
+    return {
+      status: 'success',
+      coordinates: {
+        latitude,
+        longitude,
+        locationAccuracyMetres:
+          typeof accuracy === 'number' && Number.isFinite(accuracy) && accuracy >= 0
+            ? accuracy
+            : null,
+      },
+    };
   } catch {
     return { status: 'unavailable' };
   }
