@@ -52,6 +52,7 @@ export function StormLogScreen() {
         }
         refreshControl={
           <RefreshControl
+            accessibilityLabel="Refresh saved storms"
             colors={[colors.action]}
             onRefresh={refresh}
             refreshing={isRefreshing}
@@ -72,7 +73,7 @@ export function StormLogScreen() {
 }
 
 const styles = StyleSheet.create({
-  listContent: { gap: spacing.md, paddingBottom: spacing.xl, paddingTop: spacing.sm },
+  listContent: { gap: spacing.md, paddingBottom: spacing.xl, paddingTop: spacing.md },
   emptyListContent: { flexGrow: 1 },
   refreshError: { ...typography.body, marginTop: spacing.sm },
 });

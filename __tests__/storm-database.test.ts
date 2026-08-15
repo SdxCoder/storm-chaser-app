@@ -27,13 +27,13 @@ function databaseWithVersion(version: number) {
 }
 
 describe('storm database migration', () => {
-  it('creates the storms schema and upgrades photo URIs through version two', async () => {
+  it('creates the storms schema, upgrades photo URIs, and adds the weather cache', async () => {
     const { database, transactionExecAsync, withExclusiveTransactionAsync } =
       databaseWithVersion(0);
 
     await migrateStormDatabase(database);
 
-    expect(withExclusiveTransactionAsync).toHaveBeenCalledTimes(2);
+    expect(withExclusiveTransactionAsync).toHaveBeenCalledTimes(3);
     expect(transactionExecAsync).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining('CREATE TABLE IF NOT EXISTS storms'),
@@ -51,7 +51,15 @@ describe('storm database migration', () => {
       expect.stringContaining("SET photo_uri = 'storm-photo://'"),
     );
     expect(transactionExecAsync).toHaveBeenNthCalledWith(
-      2,
+      3,
+      expect.stringContaining('CREATE TABLE IF NOT EXISTS weather_cache'),
+    );
+    expect(transactionExecAsync).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining('cached_at TEXT NOT NULL'),
+    );
+    expect(transactionExecAsync).toHaveBeenNthCalledWith(
+      3,
       expect.stringContaining(`PRAGMA user_version = ${STORM_DATABASE_VERSION}`),
     );
   });
@@ -62,12 +70,31 @@ describe('storm database migration', () => {
 
     await migrateStormDatabase(database);
 
-    expect(withExclusiveTransactionAsync).toHaveBeenCalledTimes(1);
+    expect(withExclusiveTransactionAsync).toHaveBeenCalledTimes(2);
     expect(transactionExecAsync).toHaveBeenCalledWith(
       expect.stringContaining("WHERE photo_uri LIKE 'file:%/storm-photos/%'"),
     );
     expect(transactionExecAsync).not.toHaveBeenCalledWith(
-      expect.stringContaining('CREATE TABLE'),
+      expect.stringContaining('CREATE TABLE IF NOT EXISTS storms'),
+    );
+    expect(transactionExecAsync).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining('CREATE TABLE IF NOT EXISTS weather_cache'),
+    );
+  });
+
+  it('adds only the weather cache when upgrading from version two', async () => {
+    const { database, transactionExecAsync, withExclusiveTransactionAsync } =
+      databaseWithVersion(2);
+
+    await migrateStormDatabase(database);
+
+    expect(withExclusiveTransactionAsync).toHaveBeenCalledTimes(1);
+    expect(transactionExecAsync).toHaveBeenCalledWith(
+      expect.stringContaining('CREATE TABLE IF NOT EXISTS weather_cache'),
+    );
+    expect(transactionExecAsync).not.toHaveBeenCalledWith(
+      expect.stringContaining("SET photo_uri = 'storm-photo://'"),
     );
   });
 

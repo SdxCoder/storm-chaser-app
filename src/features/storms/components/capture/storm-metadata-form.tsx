@@ -20,6 +20,7 @@ type StormMetadataFormProps = {
   onRefreshWeather: () => void;
   onSubmit: () => void;
   saveError: string | null;
+  weatherSource: 'live' | 'cache' | null;
 };
 
 export function StormMetadataForm({
@@ -34,6 +35,7 @@ export function StormMetadataForm({
   onRefreshWeather,
   onSubmit,
   saveError,
+  weatherSource,
 }: StormMetadataFormProps) {
   const { colors } = useAppTheme();
 
@@ -48,6 +50,7 @@ export function StormMetadataForm({
         isWeatherRetrying={isWeatherRetrying}
         observedAt={observedAt}
         onRefreshWeather={onRefreshWeather}
+        weatherSource={weatherSource}
       />
       <StormClassificationField control={control} errorMessage={errors.stormType?.message} />
       <StormNotesField control={control} errorMessage={errors.notes?.message} />

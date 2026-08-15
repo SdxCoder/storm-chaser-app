@@ -1,6 +1,7 @@
 import { type Control, Controller } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useOnlineStatus } from '../../../../services/connectivity/use-online-status';
 import { spacing, typography } from '../../../../theme/theme';
 import { useAppTheme } from '../../../../theme/use-app-theme';
 import { type StormMetadata, validateObservedConditions } from '../../model/storm-draft';
@@ -20,6 +21,7 @@ type ObservedConditionsFieldProps = {
   isWeatherRetrying: boolean;
   observedAt: string | null;
   onRefreshWeather: () => void;
+  weatherSource: 'live' | 'cache' | null;
 };
 
 export function ObservedConditionsField({
@@ -31,6 +33,7 @@ export function ObservedConditionsField({
   isWeatherRetrying,
   observedAt,
   onRefreshWeather,
+  weatherSource,
 }: ObservedConditionsFieldProps) {
   return (
     <CaptureSection title="Observed conditions">
@@ -58,6 +61,7 @@ export function ObservedConditionsField({
         isRetrying={isWeatherRetrying}
         observedAt={observedAt}
         onRetry={onRefreshWeather}
+        source={weatherSource}
       />
     </CaptureSection>
   );
@@ -70,6 +74,7 @@ type WeatherDraftStatusProps = {
   isRetrying: boolean;
   observedAt: string | null;
   onRetry: () => void;
+  source: 'live' | 'cache' | null;
 };
 
 function WeatherDraftStatus({
@@ -79,15 +84,18 @@ function WeatherDraftStatus({
   isRetrying,
   observedAt,
   onRetry,
+  source,
 }: WeatherDraftStatusProps) {
   const { colors } = useAppTheme();
+  const isOnline = useOnlineStatus();
 
   if (hasSnapshot && observedAt) {
     return (
       <View>
         <Text style={[styles.helper, { color: colors.textSecondary }]}>
-          Live weather attached from {new Date(observedAt).toLocaleString()}. This snapshot will not
-          be replaced by later refreshes.
+          {source === 'cache' ? 'Cached' : 'Live'} weather attached from{' '}
+          {new Date(observedAt).toLocaleString()}. This snapshot will not be replaced by later
+          refreshes.
         </Text>
         <CaptureActionButton
           disabled={isRetrying}
@@ -99,6 +107,24 @@ function WeatherDraftStatus({
   }
   if (isLoading) {
     return <Text style={[styles.helper, { color: colors.textSecondary }]}>Loading current weather…</Text>;
+  }
+  if (!isOnline) {
+    return (
+      <View>
+        <Text accessibilityRole="alert" style={[styles.helper, { color: colors.warning }]}>
+          {isError
+            ? 'Offline with no captured weather for this location. Enter observed conditions manually; saving this storm does not require internet access.'
+            : 'Offline. The last captured weather will be attached after coordinates are available. You can enter observed conditions manually.'}
+        </Text>
+        {isError ? (
+          <CaptureActionButton
+            disabled={isRetrying}
+            label={isRetrying ? 'Checking cached weather…' : 'Check cached weather again'}
+            onPress={onRetry}
+          />
+        ) : null}
+      </View>
+    );
   }
   if (isError) {
     return (

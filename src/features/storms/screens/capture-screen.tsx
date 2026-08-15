@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Text } from 'react-native';
 
+import { OfflineBanner } from '../../../components/offline-banner';
 import { ScreenContainer } from '../../../components/screen-container';
 import { spacing, typography } from '../../../theme/theme';
 import { useAppTheme } from '../../../theme/use-app-theme';
@@ -61,6 +62,9 @@ export function CaptureScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
+          <OfflineBanner
+            message="Storms can still be captured and saved using the last captured weather or manual observed conditions."
+          />
           <Text style={[styles.intro, { color: colors.textSecondary }]}>
             Take one photo, document what you observe, then save it securely on this device.
           </Text>
@@ -95,6 +99,7 @@ export function CaptureScreen() {
             onRefreshWeather={() => void weather.refetch()}
             onSubmit={metadataForm.submitDraft}
             saveError={saveErrorMessage(saveState)}
+            weatherSource={draft.weatherSnapshot?.source ?? null}
           />
         </ScrollView>
       </KeyboardAvoidingView>

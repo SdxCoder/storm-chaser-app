@@ -1,7 +1,7 @@
 import {
   currentWeatherQueryKey,
   roundWeatherCoordinate,
-} from '../src/features/weather/hooks/use-current-weather';
+} from '../src/features/weather/model/weather-location';
 
 describe('current weather query identity', () => {
   it('rounds coordinates to three decimal places', () => {
@@ -14,7 +14,6 @@ describe('current weather query identity', () => {
       currentWeatherQueryKey({
         latitude: 51.044733,
         longitude: -114.071912,
-        locationAccuracyMetres: 10,
       }),
     ).toEqual([
       'current-weather',

@@ -1,7 +1,7 @@
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 
 export const STORM_DATABASE_NAME = 'storm-chaser.db';
-export const STORM_DATABASE_VERSION = 2;
+export const STORM_DATABASE_VERSION = 3;
 
 type UserVersionRow = {
   user_version: number;
@@ -88,6 +88,32 @@ export async function migrateStormDatabase(database: SQLiteDatabase): Promise<vo
         WHERE photo_uri LIKE 'file:%/storm-photos/%';
 
         PRAGMA user_version = 2;
+      `);
+    });
+    currentVersion = 2;
+  }
+
+  if (currentVersion === 2) {
+    await database.withExclusiveTransactionAsync(async (transaction) => {
+      await transaction.execAsync(`
+        CREATE TABLE IF NOT EXISTS weather_cache (
+          cache_key TEXT PRIMARY KEY NOT NULL,
+          latitude REAL NOT NULL CHECK (latitude >= -90 AND latitude <= 90),
+          longitude REAL NOT NULL CHECK (longitude >= -180 AND longitude <= 180),
+          temperature_celsius REAL NOT NULL,
+          apparent_temperature_celsius REAL,
+          relative_humidity_percent REAL,
+          surface_pressure_hpa REAL,
+          precipitation_mm REAL NOT NULL CHECK (precipitation_mm >= 0),
+          wind_speed_kph REAL NOT NULL CHECK (wind_speed_kph >= 0),
+          wind_gust_kph REAL,
+          wind_direction_degrees REAL,
+          weather_code INTEGER,
+          observed_at TEXT NOT NULL,
+          cached_at TEXT NOT NULL
+        );
+
+        PRAGMA user_version = 3;
       `);
     });
   }

@@ -37,7 +37,7 @@ Functionality, correctness, failure handling, readable code, testing, and docume
 | 2 — Current weather vertical slice | Completed | `npm run typecheck`, `npm run lint`, 35 Jest tests, and Expo Doctor pass; user confirmed permission approval/denial, location acquisition, live weather, refresh, network recovery, and light/dark mode on a physical iOS device |
 | 3 — Storm capture and metadata | Implemented — device verification pending | `npm run typecheck`, `npm run lint`, 55 Jest tests, and Expo Doctor pass; implementation and automated verification are complete, while physical-device camera, permission, location, keyboard, and theme checks remain pending |
 | 4 — Persistence, Storm Log, and detail | Completed | Stable photo locators, legacy absolute-URI migration, strict type checking, lint, 85 Jest tests, and all 18 Expo Doctor checks pass; user confirmed all required manual iOS Save, failure/retry, log/detail, missing-state, restart-persistence, container-change, and theme checks |
-| 5 — Offline behaviour and dark mode | Not started | — |
+| 5 — Offline behaviour and dark mode | Completed | SQLite weather cache, exact rounded-coordinate matching, NetInfo/TanStack reconnect handling, offline states, and dark-mode audit implemented; `npm run typecheck`, `npm run lint`, 100 Jest tests, and all 18 Expo Doctor checks pass; user confirmed all required manual iOS live/cache, airplane-mode, no-cache, offline capture/save/browsing, reconnect, restart, historical-snapshot, and light/dark checks |
 | 6 — Conditional forecast | Not started | — |
 | 7 — Test completion, accessibility, and documentation | Not started | — |
 | 8 — Cross-platform QA and submission | Not started | — |

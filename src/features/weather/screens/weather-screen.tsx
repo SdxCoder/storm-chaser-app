@@ -8,14 +8,21 @@ import {
   View,
 } from 'react-native';
 
+import { OfflineBanner } from '../../../components/offline-banner';
 import { ScreenContainer } from '../../../components/screen-container';
+import { useOnlineStatus } from '../../../services/connectivity/use-online-status';
 import { radius, spacing, typography } from '../../../theme/theme';
 import { useAppTheme } from '../../../theme/use-app-theme';
+import {
+  OfflineWeatherUnavailableError,
+  WeatherCacheReadError,
+} from '../api/retrieve-current-weather';
 import { WeatherMetrics } from '../components/weather-metrics';
 import { useCurrentWeatherFlow } from '../hooks/use-current-weather-flow';
 
 export function WeatherScreen() {
   const { colors } = useAppTheme();
+  const isOnline = useOnlineStatus();
   const { location, requestLocation, weather } = useCurrentWeatherFlow();
 
   const retryLocation = () => {
@@ -85,6 +92,26 @@ export function WeatherScreen() {
         <WeatherMetrics weather={weather.data} />
       </View>
     );
+  } else if (!isOnline && weather.error instanceof OfflineWeatherUnavailableError) {
+    content = (
+      <StatusPanel
+        actionLabel={weather.isRefetching ? 'Checking cache…' : 'Check cache again'}
+        actionDisabled={weather.isRefetching}
+        message="No weather saved for this location is available offline. You can still document a storm using manual observed conditions."
+        onAction={retryWeather}
+        title="Offline with no cached weather"
+      />
+    );
+  } else if (!isOnline && weather.error instanceof WeatherCacheReadError) {
+    content = (
+      <StatusPanel
+        actionLabel={weather.isRefetching ? 'Retrying…' : 'Retry cached weather'}
+        actionDisabled={weather.isRefetching}
+        message="The saved weather cache could not be read. You can still document a storm using manual observed conditions."
+        onAction={retryWeather}
+        title="Offline weather unavailable"
+      />
+    );
   } else if (weather.isError) {
     content = (
       <StatusPanel
@@ -123,6 +150,13 @@ export function WeatherScreen() {
           />
         }
       >
+        <OfflineBanner
+          message={
+            weather.data?.source === 'cache'
+              ? 'Showing the last captured weather for this location.'
+              : 'Live weather is unavailable. Saved storms and offline storm documentation remain available.'
+          }
+        />
         {content}
       </ScrollView>
     </ScreenContainer>
@@ -177,6 +211,7 @@ function StatusPanel({
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
+    gap: spacing.md,
     paddingBottom: spacing.xl,
     paddingTop: spacing.md,
   },

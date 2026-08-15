@@ -39,11 +39,19 @@ export function WeatherMetrics({ weather }: WeatherMetricsProps) {
         accessibilityLabel={`Current condition: ${interpretWeatherCode(weather.weatherCode)}`}
         style={[styles.conditionCard, { backgroundColor: colors.surface }]}
       >
+        <Text
+          style={[
+            styles.source,
+            { color: weather.source === 'cache' ? colors.warning : colors.action },
+          ]}
+        >
+          {weather.source === 'cache' ? 'Cached weather' : 'Live weather'}
+        </Text>
         <Text style={[styles.condition, { color: colors.textPrimary }]}>
           {interpretWeatherCode(weather.weatherCode)}
         </Text>
         <Text style={[styles.updated, { color: colors.textSecondary }]}>
-          Updated {formatObservedAt(weather.observedAt)}
+          Observed {formatObservedAt(weather.observedAt)}
         </Text>
       </View>
       <View style={styles.grid}>
@@ -73,6 +81,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     lineHeight: 30,
+  },
+  source: {
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 20,
+    marginBottom: spacing.xs,
   },
   updated: {
     ...typography.body,

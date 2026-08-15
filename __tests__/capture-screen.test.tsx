@@ -129,6 +129,24 @@ describe('CaptureScreen', () => {
     );
   });
 
+  it('labels a cached weather snapshot with its observation time', async () => {
+    const cachedSnapshot: WeatherSnapshot = { ...weatherSnapshot, source: 'cache' };
+    const view = render(<CaptureScreen />);
+    mockUseStormDraft.mockReturnValue(
+      stormDraftState({ draft: { ...emptyDraft, weatherSnapshot: cachedSnapshot } }),
+    );
+
+    view.rerender(<CaptureScreen />);
+
+    expect(
+      await screen.findByText(
+        new RegExp(
+          `Cached weather attached from ${new Date(cachedSnapshot.observedAt).toLocaleString()}`,
+        ),
+      ),
+    ).toBeOnTheScreen();
+  });
+
   it('does not overwrite user-entered conditions after delayed weather arrives or rerenders', async () => {
     const view = render(<CaptureScreen />);
     const conditions = screen.getByLabelText('Observed conditions');
