@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+import { useRouter } from 'expo-router';
 import { KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { ScreenContainer } from '../../../components/screen-container';
@@ -8,13 +10,32 @@ import { StormMetadataForm } from '../components/capture/storm-metadata-form';
 import { StormPhotoSection } from '../components/capture/storm-photo-section';
 import { useStormDraft } from '../hooks/use-storm-draft';
 import { useStormMetadataForm } from '../hooks/use-storm-metadata-form';
+import { useSaveStorm } from '../hooks/use-save-storm';
+import { type StormDraft } from '../model/storm-draft';
 
 export function CaptureScreen() {
   const { colors } = useAppTheme();
-  const { camera, draft, location, requestCamera, requestLocation, weather } = useStormDraft();
+  const router = useRouter();
+  const { camera, draft, location, requestCamera, requestLocation, resetDraft, weather } =
+    useStormDraft();
+  const { save, state: saveState } = useSaveStorm();
+  const saveDraft = useCallback(
+    async (candidate: StormDraft) => {
+      const record = await save(candidate);
+      if (record === null) {
+        return false;
+      }
+
+      resetDraft();
+      router.replace('/(tabs)/storm-log');
+      return true;
+    },
+    [resetDraft, router, save],
+  );
   const metadataForm = useStormMetadataForm({
     draft,
     locationStatus: location.status,
+    onSave: saveDraft,
   });
 
   const openSettings = () => {
@@ -22,7 +43,6 @@ export function CaptureScreen() {
   };
 
   const takePhoto = () => {
-    metadataForm.resetCompletion();
     void requestCamera(camera.status === 'permission-denied' && camera.canAskAgain);
   };
 
@@ -42,8 +62,7 @@ export function CaptureScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <Text style={[styles.intro, { color: colors.textSecondary }]}>
-            Take one photo, then document what you observe. Nothing is permanently saved at this
-            stage.
+            Take one photo, document what you observe, then save it securely on this device.
           </Text>
 
           <StormPhotoSection
@@ -66,7 +85,6 @@ export function CaptureScreen() {
           />
           <StormMetadataForm
             control={metadataForm.control}
-            draftComplete={metadataForm.draftComplete}
             errors={metadataForm.errors}
             hasWeatherSnapshot={draft.weatherSnapshot !== null}
             isSubmitting={metadataForm.isSubmitting}
@@ -76,11 +94,29 @@ export function CaptureScreen() {
             observedAt={draft.weatherSnapshot?.observedAt ?? null}
             onRefreshWeather={() => void weather.refetch()}
             onSubmit={metadataForm.submitDraft}
+            saveError={saveErrorMessage(saveState)}
           />
         </ScrollView>
       </KeyboardAvoidingView>
     </ScreenContainer>
   );
+}
+
+function saveErrorMessage(saveState: ReturnType<typeof useSaveStorm>['state']): string | null {
+  if (saveState.status !== 'error') {
+    return null;
+  }
+
+  if (saveState.reason === 'photo-copy') {
+    return 'The photo could not be copied into durable storage. Your draft is preserved; try Save again.';
+  }
+  if (saveState.reason === 'invalid-draft') {
+    return 'The observation is incomplete. Review the highlighted fields and try again.';
+  }
+  if (saveState.cleanupFailed) {
+    return 'The record could not be saved. Your draft is preserved, but automatic photo cleanup was incomplete. Try Save again.';
+  }
+  return 'The record could not be saved. Your draft and temporary photo are preserved; try Save again.';
 }
 
 const styles = StyleSheet.create({

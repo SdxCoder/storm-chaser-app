@@ -5,21 +5,11 @@ import { radius, spacing } from '../../../../theme/theme';
 import { useAppTheme } from '../../../../theme/use-app-theme';
 import {
   type StormMetadata,
-  type StormType,
   stormTypes,
   validateStormType,
 } from '../../model/storm-draft';
+import { stormTypeLabel } from '../../model/storm-type-label';
 import { CaptureFieldError, CaptureSection } from './capture-ui';
-
-const stormTypeLabels: Record<StormType, string> = {
-  thunderstorm: 'Thunderstorm',
-  tornado: 'Tornado',
-  hail: 'Hail',
-  'heavy-rain': 'Heavy rain',
-  'high-wind': 'High wind',
-  snowstorm: 'Snowstorm',
-  other: 'Other',
-};
 
 type StormClassificationFieldProps = {
   control: Control<StormMetadata>;
@@ -44,7 +34,7 @@ export function StormClassificationField({
               const selected = value === stormType;
               return (
                 <Pressable
-                  accessibilityLabel={stormTypeLabels[stormType]}
+                  accessibilityLabel={stormTypeLabel(stormType)}
                   accessibilityRole="radio"
                   accessibilityState={{ checked: selected }}
                   key={stormType}
@@ -59,7 +49,7 @@ export function StormClassificationField({
                   ]}
                 >
                   <Text style={{ color: selected ? colors.background : colors.textPrimary }}>
-                    {stormTypeLabels[stormType]}
+                    {stormTypeLabel(stormType)}
                   </Text>
                 </Pressable>
               );

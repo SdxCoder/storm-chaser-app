@@ -10,7 +10,6 @@ import { StormNotesField } from './storm-notes-field';
 
 type StormMetadataFormProps = {
   control: Control<StormMetadata>;
-  draftComplete: boolean;
   errors: FieldErrors<StormMetadata>;
   hasWeatherSnapshot: boolean;
   isSubmitting: boolean;
@@ -20,11 +19,11 @@ type StormMetadataFormProps = {
   observedAt: string | null;
   onRefreshWeather: () => void;
   onSubmit: () => void;
+  saveError: string | null;
 };
 
 export function StormMetadataForm({
   control,
-  draftComplete,
   errors,
   hasWeatherSnapshot,
   isSubmitting,
@@ -34,6 +33,7 @@ export function StormMetadataForm({
   observedAt,
   onRefreshWeather,
   onSubmit,
+  saveError,
 }: StormMetadataFormProps) {
   const { colors } = useAppTheme();
 
@@ -53,24 +53,24 @@ export function StormMetadataForm({
       <StormNotesField control={control} errorMessage={errors.notes?.message} />
 
       <Pressable
-        accessibilityLabel="Complete storm draft"
+        accessibilityLabel="Save storm observation"
         accessibilityRole="button"
-        accessibilityState={{ disabled: isSubmitting || draftComplete }}
-        disabled={isSubmitting || draftComplete}
+        accessibilityState={{ disabled: isSubmitting }}
+        disabled={isSubmitting}
         onPress={onSubmit}
         style={({ pressed }) => [
           styles.completeButton,
           { backgroundColor: colors.action },
-          (pressed || isSubmitting || draftComplete) && styles.dimmed,
+          (pressed || isSubmitting) && styles.dimmed,
         ]}
       >
         <Text style={[styles.completeButtonText, { color: colors.background }]}>
-          {draftComplete ? 'Draft complete' : 'Complete draft'}
+          {isSubmitting ? 'Saving observation…' : 'Save observation'}
         </Text>
       </Pressable>
-      {draftComplete ? (
-        <Text accessibilityRole="alert" style={[styles.success, { color: colors.textPrimary }]}>
-          Draft complete. It remains in memory and has not been permanently saved.
+      {saveError ? (
+        <Text accessibilityRole="alert" style={[styles.error, { color: colors.error }]}>
+          {saveError}
         </Text>
       ) : null}
     </>
@@ -87,5 +87,5 @@ const styles = StyleSheet.create({
   },
   completeButtonText: { fontSize: 17, fontWeight: '700' },
   dimmed: { opacity: 0.55 },
-  success: { ...typography.body, fontWeight: '600', textAlign: 'center' },
+  error: { ...typography.body, fontWeight: '600', textAlign: 'center' },
 });

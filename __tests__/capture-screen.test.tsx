@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 import { CaptureScreen } from '../src/features/storms/screens/capture-screen';
 import { type WeatherSnapshot } from '../src/features/weather/model/weather-snapshot';
@@ -7,9 +7,21 @@ const mockRequestCamera = jest.fn();
 const mockRequestLocation = jest.fn();
 const mockRefetchWeather = jest.fn();
 const mockUseStormDraft = jest.fn();
+const mockUseSaveStorm = jest.fn();
+const mockSave = jest.fn();
+const mockReplace = jest.fn();
+const mockResetDraft = jest.fn();
+
+jest.mock('expo-router', () => ({
+  useRouter: () => ({ replace: mockReplace }),
+}));
 
 jest.mock('../src/features/storms/hooks/use-storm-draft', () => ({
   useStormDraft: () => mockUseStormDraft(),
+}));
+
+jest.mock('../src/features/storms/hooks/use-save-storm', () => ({
+  useSaveStorm: () => mockUseSaveStorm(),
 }));
 
 const weatherSnapshot: WeatherSnapshot = {
@@ -42,6 +54,7 @@ function stormDraftState(overrides: Record<string, unknown> = {}) {
     location: { status: 'idle' },
     requestCamera: mockRequestCamera,
     requestLocation: mockRequestLocation,
+    resetDraft: mockResetDraft,
     weather: {
       data: undefined,
       isError: false,
@@ -56,6 +69,8 @@ function stormDraftState(overrides: Record<string, unknown> = {}) {
 describe('CaptureScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSave.mockResolvedValue(null);
+    mockUseSaveStorm.mockReturnValue({ save: mockSave, state: { status: 'idle' } });
     mockUseStormDraft.mockReturnValue(stormDraftState());
   });
 
@@ -67,7 +82,7 @@ describe('CaptureScreen', () => {
     fireEvent.changeText(conditions, 'Shelf cloud with strong inflow');
     fireEvent.changeText(notes, 'Moving toward the northeast.');
     fireEvent.press(screen.getByRole('radio', { name: 'High wind' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Complete storm draft' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Save storm observation' }));
 
     expect(await screen.findByText('Take a storm photo before completing the draft.')).toBeOnTheScreen();
     expect(screen.getByText('Current coordinates are required. Try location again.')).toBeOnTheScreen();
@@ -166,7 +181,7 @@ describe('CaptureScreen', () => {
     expect(screen.getByText(/Camera permission denied/)).toBeOnTheScreen();
   });
 
-  it('validates a complete in-memory draft without persisting it', async () => {
+  it('submits a complete draft to the save workflow', async () => {
     mockUseStormDraft.mockReturnValue(
       stormDraftState({
         draft: {
@@ -184,10 +199,120 @@ describe('CaptureScreen', () => {
 
     fireEvent.changeText(screen.getByLabelText('Observed conditions'), 'Strong gusts and hail');
     fireEvent.press(screen.getByRole('radio', { name: 'Hail' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Complete storm draft' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Save storm observation' }));
 
-    expect(
-      await screen.findByText('Draft complete. It remains in memory and has not been permanently saved.'),
-    ).toBeOnTheScreen();
+    await waitFor(() =>
+      expect(mockSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          temporaryPhotoUri: 'file:///temporary/storm.jpg',
+          stormType: 'hail',
+          observedConditions: 'Strong gusts and hail',
+        }),
+      ),
+    );
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it('clears the in-memory draft and navigates to the Storm Log only after Save succeeds', async () => {
+    mockSave.mockResolvedValue({
+      id: 'storm-test-123',
+      photoUri: 'storm-photo://storm-test-123.jpg',
+    });
+    mockUseStormDraft.mockReturnValue(
+      stormDraftState({
+        draft: {
+          ...emptyDraft,
+          temporaryPhotoUri: 'file:///temporary/storm.jpg',
+          capturedAt: '2026-08-14T23:01:02.000Z',
+          latitude: 51.0447,
+          longitude: -114.0719,
+          locationAccuracyMetres: 10,
+        },
+        location: { status: 'ready' },
+      }),
+    );
+    render(<CaptureScreen />);
+
+    fireEvent.changeText(screen.getByLabelText('Observed conditions'), 'Strong gusts and hail');
+    fireEvent.press(screen.getByRole('radio', { name: 'Hail' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Save storm observation' }));
+
+    await waitFor(() => expect(mockResetDraft).toHaveBeenCalledTimes(1));
+    expect(mockReplace).toHaveBeenCalledWith('/(tabs)/storm-log');
+  });
+
+  it('preserves the completed form and temporary photo after a recoverable save failure', async () => {
+    mockUseSaveStorm.mockReturnValue({
+      save: mockSave,
+      state: { status: 'error', reason: 'database', cleanupFailed: false },
+    });
+    mockUseStormDraft.mockReturnValue(
+      stormDraftState({
+        draft: {
+          ...emptyDraft,
+          temporaryPhotoUri: 'file:///temporary/storm.jpg',
+          capturedAt: '2026-08-14T23:01:02.000Z',
+          latitude: 51.0447,
+          longitude: -114.0719,
+          locationAccuracyMetres: 10,
+        },
+        location: { status: 'ready' },
+      }),
+    );
+    render(<CaptureScreen />);
+
+    fireEvent.changeText(screen.getByLabelText('Observed conditions'), 'Strong gusts and hail');
+    fireEvent.changeText(screen.getByLabelText('Storm notes'), 'Still tracking northeast.');
+    fireEvent.press(screen.getByRole('radio', { name: 'Hail' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Save storm observation' }));
+
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+    expect(screen.getByLabelText('Captured storm photo preview')).toHaveProp('source', {
+      uri: 'file:///temporary/storm.jpg',
+    });
+    expect(screen.getByLabelText('Observed conditions')).toHaveProp(
+      'value',
+      'Strong gusts and hail',
+    );
+    expect(screen.getByLabelText('Storm notes')).toHaveProp(
+      'value',
+      'Still tracking northeast.',
+    );
+    expect(screen.getByText(/draft and temporary photo are preserved/)).toBeOnTheScreen();
+  });
+
+  it('prevents rapid duplicate Save submissions at the form boundary', async () => {
+    let resolveSave: (value: null) => void = () => undefined;
+    mockSave.mockReturnValue(
+      new Promise<null>((resolve) => {
+        resolveSave = resolve;
+      }),
+    );
+    mockUseStormDraft.mockReturnValue(
+      stormDraftState({
+        draft: {
+          ...emptyDraft,
+          temporaryPhotoUri: 'file:///temporary/storm.jpg',
+          capturedAt: '2026-08-14T23:01:02.000Z',
+          latitude: 51.0447,
+          longitude: -114.0719,
+          locationAccuracyMetres: 10,
+        },
+        location: { status: 'ready' },
+      }),
+    );
+    render(<CaptureScreen />);
+
+    fireEvent.changeText(screen.getByLabelText('Observed conditions'), 'Strong gusts and hail');
+    fireEvent.press(screen.getByRole('radio', { name: 'Hail' }));
+    const saveButton = screen.getByRole('button', { name: 'Save storm observation' });
+    fireEvent.press(saveButton);
+    fireEvent.press(saveButton);
+
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+    await act(async () => {
+      resolveSave(null);
+      await Promise.resolve();
+    });
   });
 });

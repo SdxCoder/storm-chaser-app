@@ -9,6 +9,10 @@ const mockCaptureStormPhoto = jest.fn();
 const mockRefetchWeather = jest.fn();
 const mockUseCurrentWeather = jest.fn();
 
+jest.mock('expo-router', () => ({
+  useRouter: () => ({ replace: jest.fn() }),
+}));
+
 jest.mock('../src/features/storms/services/storm-camera', () => ({
   captureStormPhoto: () => mockCaptureStormPhoto(),
 }));
@@ -19,6 +23,10 @@ jest.mock('../src/services/location/current-location', () => ({
 
 jest.mock('../src/features/weather/hooks/use-current-weather', () => ({
   useCurrentWeather: (coordinates: unknown) => mockUseCurrentWeather(coordinates),
+}));
+
+jest.mock('../src/features/storms/hooks/use-save-storm', () => ({
+  useSaveStorm: () => ({ save: jest.fn(), state: { status: 'idle' } }),
 }));
 
 const firstWeatherSnapshot: WeatherSnapshot = {

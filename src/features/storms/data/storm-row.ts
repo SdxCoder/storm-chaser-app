@@ -1,0 +1,24 @@
+export type StormRow = {
+  id: string;
+  photo_uri: string;
+  captured_at: string;
+  created_at: string;
+  updated_at: string;
+  latitude: number;
+  longitude: number;
+  location_accuracy_metres: number | null;
+  storm_type: string;
+  notes: string;
+  observed_conditions: string;
+  weather_temperature_celsius: number | null;
+  weather_apparent_temperature_celsius: number | null;
+  weather_relative_humidity_percent: number | null;
+  weather_surface_pressure_hpa: number | null;
+  weather_precipitation_mm: number | null;
+  weather_wind_speed_kph: number | null;
+  weather_wind_gust_kph: number | null;
+  weather_wind_direction_degrees: number | null;
+  weather_code: number | null;
+  weather_observed_at: string | null;
+  weather_source: string | null;
+};

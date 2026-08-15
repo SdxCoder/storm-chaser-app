@@ -112,6 +112,13 @@ export function useStormDraft() {
     [requestLocation],
   );
 
+  const resetDraft = useCallback(() => {
+    latestLocationRequestId.current += 1;
+    setCamera({ status: 'idle' });
+    setDraft({ ...initialDraft });
+    setLocation({ status: 'idle' });
+  }, []);
+
   useEffect(() => {
     const snapshot = weather.data;
     if (!snapshot || draft.latitude === null || draft.longitude === null) {
@@ -125,5 +132,5 @@ export function useStormDraft() {
     );
   }, [draft.latitude, draft.longitude, weather.data]);
 
-  return { camera, draft, location, requestCamera, requestLocation, weather };
+  return { camera, draft, location, requestCamera, requestLocation, resetDraft, weather };
 }

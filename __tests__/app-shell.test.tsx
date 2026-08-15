@@ -4,6 +4,11 @@ import { CaptureScreen } from '../src/features/storms/screens/capture-screen';
 import { StormLogScreen } from '../src/features/storms/screens/storm-log-screen';
 import { WeatherScreen } from '../src/features/weather/screens/weather-screen';
 
+jest.mock('expo-router', () => ({
+  useFocusEffect: jest.fn(),
+  useRouter: () => ({ back: jest.fn(), push: jest.fn(), replace: jest.fn() }),
+}));
+
 jest.mock('../src/features/weather/hooks/use-current-weather-flow', () => ({
   useCurrentWeatherFlow: () => ({
     location: { status: 'loading' },
@@ -33,6 +38,7 @@ jest.mock('../src/features/storms/hooks/use-storm-draft', () => ({
     location: { status: 'idle' },
     requestCamera: jest.fn(),
     requestLocation: jest.fn(),
+    resetDraft: jest.fn(),
     weather: {
       data: undefined,
       isError: false,
@@ -40,6 +46,19 @@ jest.mock('../src/features/storms/hooks/use-storm-draft', () => ({
       isRefetching: false,
       refetch: jest.fn(),
     },
+  }),
+}));
+
+jest.mock('../src/features/storms/hooks/use-save-storm', () => ({
+  useSaveStorm: () => ({ save: jest.fn(), state: { status: 'idle' } }),
+}));
+
+jest.mock('../src/features/storms/hooks/use-storm-log', () => ({
+  useStormLog: () => ({
+    isRefreshing: false,
+    refresh: jest.fn(),
+    reload: jest.fn(),
+    state: { status: 'success', records: [] },
   }),
 }));
 

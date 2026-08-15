@@ -10,3 +10,5 @@ Record active assessment work here as it occurs. The 24-hour maximum includes pl
 | 2026-08-14 | Milestone 2 implementation, tests, documentation, automated verification, and manual iOS test | 1h 44m elapsed |
 | 2026-08-14 | Milestone 3 in-memory storm capture, metadata form, tests, documentation, and automated verification | Approximately 1h 17m elapsed; physical-device checks pending |
 | 2026-08-14 | Milestone 3 follow-up hardening: camera-service boundary, recapture race protection, capture-screen decomposition, review, and automated verification | Approximately 0h 46m elapsed|
+| 2026-08-14 | Milestone 4 SQLite persistence, durable photo storage, Save compensation, Storm Log, detail, focused tests, documentation, and automated verification | Approximately 1h elapsed; physical-device checks later confirmed 2026-08-15 |
+| 2026-08-15 | Milestone 4 iOS container-path diagnosis, stable photo-locator repair, legacy URI migration, regression tests, documentation, and automated verification | Approximately 0h 20m elapsed; all required manual checks confirmed |

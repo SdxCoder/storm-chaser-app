@@ -23,11 +23,13 @@ const defaultMetadata: StormMetadata = {
 type UseStormMetadataFormOptions = {
   draft: CaptureDraftState;
   locationStatus: LocationState['status'];
+  onSave: (draft: StormDraft) => Promise<boolean>;
 };
 
 export function useStormMetadataForm({
   draft,
   locationStatus,
+  onSave,
 }: UseStormMetadataFormOptions) {
   const {
     control,
@@ -35,14 +37,12 @@ export function useStormMetadataForm({
     getFieldState,
     getValues,
     handleSubmit,
+    reset,
     setValue,
-    watch,
   } = useForm<StormMetadata>({ defaultValues: defaultMetadata, mode: 'onSubmit' });
   const [draftErrors, setDraftErrors] = useState<StormDraftErrors>({});
-  const [draftComplete, setDraftComplete] = useState(false);
-  const completionInProgress = useRef(false);
+  const submissionInProgress = useRef(false);
   const observedPrefillConsidered = useRef(false);
-  const watchedMetadata = watch();
 
   useEffect(() => {
     const snapshot = draft.weatherSnapshot;
@@ -60,11 +60,6 @@ export function useStormMetadataForm({
   }, [draft.weatherSnapshot, getFieldState, setValue]);
 
   useEffect(() => {
-    completionInProgress.current = false;
-    setDraftComplete(false);
-  }, [watchedMetadata.notes, watchedMetadata.observedConditions, watchedMetadata.stormType]);
-
-  useEffect(() => {
     if (draft.temporaryPhotoUri) {
       setDraftErrors((current) => ({
         ...current,
@@ -80,39 +75,42 @@ export function useStormMetadataForm({
     }
   }, [locationStatus]);
 
-  const completeDraft: SubmitHandler<StormMetadata> = (metadata) => {
-    if (completionInProgress.current) {
+  const saveDraft: SubmitHandler<StormMetadata> = async (metadata) => {
+    if (submissionInProgress.current) {
       return;
     }
-    completionInProgress.current = true;
+    submissionInProgress.current = true;
 
     const candidate: StormDraft = { ...draft, ...metadata };
     const validationErrors = validateStormDraft(candidate);
     setDraftErrors(validationErrors);
-    setDraftComplete(Object.keys(validationErrors).length === 0);
     if (Object.keys(validationErrors).length > 0) {
-      completionInProgress.current = false;
+      submissionInProgress.current = false;
+      return;
+    }
+
+    try {
+      const saved = await onSave(candidate);
+      if (saved) {
+        observedPrefillConsidered.current = false;
+        setDraftErrors({});
+        reset(defaultMetadata);
+      }
+    } finally {
+      submissionInProgress.current = false;
     }
   };
 
   const invalidMetadata: SubmitErrorHandler<StormMetadata> = () => {
-    completionInProgress.current = false;
+    submissionInProgress.current = false;
     setDraftErrors(validateStormDraft({ ...draft, ...getValues() }));
-    setDraftComplete(false);
-  };
-
-  const resetCompletion = () => {
-    completionInProgress.current = false;
-    setDraftComplete(false);
   };
 
   return {
     control,
-    draftComplete,
     draftErrors,
     errors,
     isSubmitting,
-    resetCompletion,
-    submitDraft: handleSubmit(completeDraft, invalidMetadata),
+    submitDraft: handleSubmit(saveDraft, invalidMetadata),
   };
 }
