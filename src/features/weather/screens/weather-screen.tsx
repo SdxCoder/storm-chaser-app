@@ -18,12 +18,17 @@ import {
   WeatherCacheReadError,
 } from '../api/retrieve-current-weather';
 import { WeatherMetrics } from '../components/weather-metrics';
+import { WeatherForecast } from '../components/weather-forecast';
 import { useCurrentWeatherFlow } from '../hooks/use-current-weather-flow';
+import { useWeatherForecast } from '../hooks/use-weather-forecast';
 
 export function WeatherScreen() {
   const { colors } = useAppTheme();
   const isOnline = useOnlineStatus();
   const { location, requestLocation, weather } = useCurrentWeatherFlow();
+  const forecast = useWeatherForecast(
+    location.status === 'ready' ? location.coordinates : null,
+  );
 
   const retryLocation = () => {
     void requestLocation(true);
@@ -90,6 +95,13 @@ export function WeatherScreen() {
           </Text>
         ) : null}
         <WeatherMetrics weather={weather.data} />
+        <WeatherForecast
+          days={forecast.data}
+          isLoading={forecast.isPending || forecast.isFetching}
+          isOnline={isOnline}
+          onRetry={() => void forecast.refetch()}
+          unavailable={forecast.isError || forecast.data?.length === 0}
+        />
       </View>
     );
   } else if (!isOnline && weather.error instanceof OfflineWeatherUnavailableError) {

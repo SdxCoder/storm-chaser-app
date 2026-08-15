@@ -24,6 +24,16 @@ jest.mock('../src/features/weather/hooks/use-current-weather-flow', () => ({
   }),
 }));
 
+jest.mock('../src/features/weather/hooks/use-weather-forecast', () => ({
+  useWeatherForecast: () => ({
+    data: undefined,
+    isError: false,
+    isFetching: false,
+    isPending: true,
+    refetch: jest.fn(),
+  }),
+}));
+
 jest.mock('../src/features/storms/hooks/use-storm-draft', () => ({
   useStormDraft: () => ({
     camera: { status: 'idle' },

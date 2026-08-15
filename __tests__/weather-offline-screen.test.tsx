@@ -15,6 +15,16 @@ jest.mock('../src/features/weather/hooks/use-current-weather-flow', () => ({
   useCurrentWeatherFlow: () => mockUseCurrentWeatherFlow(),
 }));
 
+jest.mock('../src/features/weather/hooks/use-weather-forecast', () => ({
+  useWeatherForecast: () => ({
+    data: undefined,
+    isError: false,
+    isFetching: false,
+    isPending: true,
+    refetch: jest.fn(),
+  }),
+}));
+
 const cachedWeather: WeatherSnapshot = {
   temperatureCelsius: 18,
   apparentTemperatureCelsius: 17,

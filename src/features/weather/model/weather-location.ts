@@ -31,3 +31,12 @@ export function currentWeatherQueryKey(coordinates: WeatherCoordinates | null) {
     normalized?.longitude ?? null,
   ] as const;
 }
+
+export function forecastQueryKey(coordinates: WeatherCoordinates | null) {
+  const normalized = coordinates === null ? null : normalizeWeatherCoordinates(coordinates);
+  return [
+    'weather-forecast',
+    normalized?.latitude ?? null,
+    normalized?.longitude ?? null,
+  ] as const;
+}

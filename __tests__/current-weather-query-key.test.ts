@@ -1,5 +1,6 @@
 import {
   currentWeatherQueryKey,
+  forecastQueryKey,
   roundWeatherCoordinate,
 } from '../src/features/weather/model/weather-location';
 
@@ -17,6 +18,14 @@ describe('current weather query identity', () => {
       }),
     ).toEqual([
       'current-weather',
+      51.045,
+      -114.072,
+    ]);
+  });
+
+  it('keeps forecast state separate while using the same rounded location identity', () => {
+    expect(forecastQueryKey({ latitude: 51.044733, longitude: -114.071912 })).toEqual([
+      'weather-forecast',
       51.045,
       -114.072,
     ]);
