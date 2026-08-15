@@ -852,16 +852,18 @@ Codex must implement only the milestone explicitly authorized in the active prom
 - Database initialization and migration
 - `storms` schema
 - Storm row mapper and repository
-- Save mutation
+- Save workflow with explicit saving, success, and recoverable-error states
 - Storm Log list
 - Empty state
 - Storm detail screen
 - Invalid/missing-record state
-- Query invalidation after save
+- Storm Log refresh after successful save
 - On Save confirmation, copy the temporary photo into app-owned durable storage
 - SQLite insert using the durable photo URI
 - Orphaned-photo cleanup after failed insert
 - Temporary source retention until the save workflow no longer requires it
+
+**State ownership boundary:** TanStack Query remains responsible only for remote Open-Meteo state. SQLite remains the source of truth for storm records. The Storm Log reloads from SQLite after a successful Save or when the screen regains focus. Do not wrap SQLite reads or writes in TanStack Query hooks.
 
 **Acceptance criteria:**
 
