@@ -16,7 +16,7 @@ export function StormCard({ onPress, record }: StormCardProps) {
   return (
     <Pressable
       accessibilityHint="Opens the saved storm details"
-      accessibilityLabel={`${stormTypeLabel(record.stormType)} captured ${new Date(record.capturedAt).toLocaleString()}`}
+      accessibilityLabel={`${stormTypeLabel(record.stormType)} captured ${new Date(record.capturedAt).toLocaleString()}. ${record.observedConditions}. Coordinates ${record.latitude.toFixed(5)}, ${record.longitude.toFixed(5)}`}
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [

@@ -56,9 +56,9 @@ export function StormMetadataForm({
       <StormNotesField control={control} errorMessage={errors.notes?.message} />
 
       <Pressable
-        accessibilityLabel="Save storm observation"
+        accessibilityLabel={isSubmitting ? 'Saving storm observation' : 'Save storm observation'}
         accessibilityRole="button"
-        accessibilityState={{ disabled: isSubmitting }}
+        accessibilityState={{ busy: isSubmitting, disabled: isSubmitting }}
         disabled={isSubmitting}
         onPress={onSubmit}
         style={({ pressed }) => [

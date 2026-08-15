@@ -68,8 +68,16 @@ function LocationDetails({
   const { colors } = useAppTheme();
 
   if (location.status === 'ready' && latitude !== null && longitude !== null) {
+    const accuracy =
+      locationAccuracyMetres === null
+        ? 'accuracy unavailable'
+        : `accuracy about ${Math.round(locationAccuracyMetres)} metres`;
+
     return (
-      <View accessible accessibilityLabel={`Coordinates ${latitude}, ${longitude}`}>
+      <View
+        accessible
+        accessibilityLabel={`Coordinates ${latitude}, ${longitude}, ${accuracy}`}
+      >
         <DetailRow label="Latitude" value={latitude.toFixed(5)} />
         <DetailRow label="Longitude" value={longitude.toFixed(5)} />
         <DetailRow

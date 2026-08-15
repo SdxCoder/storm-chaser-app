@@ -48,7 +48,7 @@ export function WeatherForecast({
   unavailable,
 }: WeatherForecastProps) {
   const { colors } = useAppTheme();
-  const hasDays = days !== undefined && days.length > 0;
+  const hasDays = isOnline && days !== undefined && days.length > 0;
 
   return (
     <View style={styles.section}>

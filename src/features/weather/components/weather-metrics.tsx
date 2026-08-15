@@ -21,6 +21,8 @@ function formatObservedAt(observedAt: string): string {
 
 export function WeatherMetrics({ weather }: WeatherMetricsProps) {
   const { colors } = useAppTheme();
+  const weatherSource = weather.source === 'cache' ? 'Cached weather' : 'Live weather';
+  const observedAt = formatObservedAt(weather.observedAt);
   const metrics = [
     ['Temperature', formatMetric(weather.temperatureCelsius, ' °C')],
     ['Feels like', formatMetric(weather.apparentTemperatureCelsius, ' °C')],
@@ -36,7 +38,7 @@ export function WeatherMetrics({ weather }: WeatherMetricsProps) {
     <View>
       <View
         accessible
-        accessibilityLabel={`Current condition: ${interpretWeatherCode(weather.weatherCode)}`}
+        accessibilityLabel={`${weatherSource}. Current condition: ${interpretWeatherCode(weather.weatherCode)}. Observed ${observedAt}`}
         style={[styles.conditionCard, { backgroundColor: colors.surface }]}
       >
         <Text
@@ -45,13 +47,13 @@ export function WeatherMetrics({ weather }: WeatherMetricsProps) {
             { color: weather.source === 'cache' ? colors.warning : colors.action },
           ]}
         >
-          {weather.source === 'cache' ? 'Cached weather' : 'Live weather'}
+          {weatherSource}
         </Text>
         <Text style={[styles.condition, { color: colors.textPrimary }]}>
           {interpretWeatherCode(weather.weatherCode)}
         </Text>
         <Text style={[styles.updated, { color: colors.textSecondary }]}>
-          Observed {formatObservedAt(weather.observedAt)}
+          Observed {observedAt}
         </Text>
       </View>
       <View style={styles.grid}>

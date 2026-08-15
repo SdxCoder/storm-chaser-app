@@ -1,29 +1,172 @@
 # AI Usage Disclosure
 
-## Tools used
+## Tools Used
 
+- OpenAI ChatGPT
 - OpenAI Codex
 
-## Purposes
+## How AI Was Used
 
-- Audited the architecture plan against the assessment and repository state.
-- Initialized and verified the Expo SDK 54 application foundation.
-- Completed the Milestone 1 provider, navigation, placeholder-screen, and theme shell.
-- Assisted with dependency compatibility, native configuration, linting, type checking, and test setup.
-- Implemented the Milestone 2 foreground-location flow, Open-Meteo boundary, current-weather query, weather UI states, pull-to-refresh, and focused tests.
-- Confirmed the requested Open-Meteo current response shape and units with a live curl request using representative Calgary coordinates before defining the transport type.
-- Implemented the Milestone 3 temporary camera-capture workflow, local draft orchestration, React Hook Form metadata fields, immutable live-weather snapshot attachment, coordinate/accuracy capture, validation, accessible UI states, and focused tests.
-- Refined Milestone 3 by isolating the camera platform boundary, protecting recapture from superseded location results, and decomposing capture presentation into cohesive feature-local components without changing state ownership or persistence scope.
-- Assisted with Milestone 3 automated verification and scope review to keep durable photo storage and SQLite storm persistence excluded.
-- Implemented the Milestone 4 versioned SQLite schema, explicit row/domain mapping, storm repository, SDK 54 durable photo-storage boundary, compensated Save workflow, duplicate-submission protection, focus-refreshed Storm Log, storm detail route, missing-record and missing-photo states, and focused tests.
-- Verified Milestone 4 with strict type checking, Expo lint, 75 Jest tests, and all 18 Expo Doctor checks; physical-device verification remains pending.
-- Diagnosed an iOS development-build container UUID change using device diagnostics, then repaired Milestone 4 photo persistence with stable logical photo URIs, a version-two migration for legacy absolute URIs, current-container resolution, and focused regression tests.
-- Re-verified the Milestone 4 repair with strict type checking, Expo lint, 85 Jest tests, and all 18 Expo Doctor checks; the user subsequently confirmed all required manual and physical-device checks pass.
-- Implemented the Milestone 5 version-three SQLite weather-cache migration, explicit cache row/domain mapping and data access, exact rounded-coordinate cache identity, live-write/network-fallback orchestration, NetInfo integration with TanStack Query online state and reconnect refresh, offline indicators and manual-observation guidance, system-theme completion, and focused tests.
-- Verified Milestone 5 with strict type checking, Expo lint, 100 Jest tests, and all 18 Expo Doctor checks; the user subsequently confirmed all required manual iOS offline cache/no-cache, offline capture and persistence, reconnect, restart, immutable historical weather, and light/dark checks pass after rebuilding the native development build for NetInfo.
-- Implemented the conditional Milestone 6 forecast as a separate three-day Open-Meteo daily request, explicit forecast transport/domain boundary, defensive parallel-array mapper, rounded-coordinate TanStack query, compact accessible light/dark presentation, and isolated loading, offline, malformed-response, error, and retry states.
-- Verified Milestone 6 with strict type checking, Expo lint, 111 Jest tests, and all 18 Expo Doctor checks without using a live API in automated tests; the user confirmed forecast failure leaves current weather usable and manual retry loads the forecast successfully.
+### Planning and architecture
 
-## AI-assisted code
+ChatGPT was used to:
 
-Codex generated the initial application shell, Expo configuration, provider composition, three-tab navigation, semantic theme tokens, lint and test configuration, and foundation tests. For Milestone 2, Codex generated the location service, validated Open-Meteo mapping, TanStack Query integration, current-weather presentation and error states, and focused unit tests. For Milestone 3, Codex generated the in-memory storm draft model and validation, system-camera permission/capture boundary, capture orchestration, metadata form and accessibility states, current-coordinate and live-weather snapshot integration, and focused unit/component tests. For Milestone 4, Codex generated the SQLite database migrations and provider, persisted storm model/row mapping and repository, stable durable-photo locator and current-container resolution, durable photo copy and cleanup boundary, Save coordination and UI states, Storm Log and detail flows, and focused persistence/component tests. For Milestone 5, Codex generated the SQLite current-weather cache, cache mapping and retrieval boundaries, live-to-cache fallback, connectivity integration, offline and cached-weather presentation, reconnect refresh, theme completion, and focused regression tests. For Milestone 6, Codex generated the separate forecast API/query boundary, defensive daily-array mapper, forecast domain model, compact forecast component, failure-isolated Weather screen integration, and focused tests. Record deletion, map, cloud features, and background synchronization have not been generated or implemented.
+- Analyze the assessment requirements and identify the expected Senior-level engineering signals.
+- Compare architectural and technology options within the 24-hour constraint.
+- Define and challenge the feature-based, Bulletproof-inspired project structure.
+- Establish milestone scope, acceptance criteria, exclusions, and timeboxes.
+- Review implementation decisions and explain their trade-offs.
+- Prepare focused prompts for each implementation and review milestone.
+- Assist with reviewer-facing documentation wording and final submission planning.
+
+Codex was used to inspect the repository, validate plans against the existing implementation, implement approved milestones, run verification commands, review diffs, and identify defects or missing coverage.
+
+### Project foundation
+
+Codex assisted with:
+
+- Initializing the Expo SDK 54 application.
+- Configuring strict TypeScript, Expo Router, linting, testing, and native permissions.
+- Creating the provider composition, three-tab navigation, semantic theme tokens, and placeholder application shell.
+- Checking dependency compatibility and Expo configuration.
+
+### Current weather
+
+Codex assisted with:
+
+- The foreground-location permission and acquisition flow.
+- The Open-Meteo transport boundary and validated domain mapping.
+- TanStack Query integration.
+- Current-weather loading, success, permission, not-found, offline, and retry states.
+- Pull-to-refresh and focused tests.
+- Confirmation of the requested Open-Meteo response shape and units through a live `curl` request before finalizing the transport mapping.
+
+### Storm capture and metadata
+
+Codex assisted with:
+
+- The system-camera permission and capture boundary using Expo Image Picker.
+- Camera cancellation and unavailable-camera outcomes.
+- In-memory storm-draft orchestration.
+- React Hook Form metadata fields and validation.
+- Coordinate, timestamp, and immutable weather-snapshot attachment.
+- Manual observed-condition fallback.
+- Photo preview and accessible form states.
+- Recapture protection against stale or superseded location and weather results.
+- Decomposition of the capture screen into cohesive feature-local components.
+- Focused unit and component tests.
+
+Durable photo storage and SQLite storm persistence were deliberately excluded from this milestone and implemented separately.
+
+### Storm persistence
+
+Codex assisted with:
+
+- Versioned Expo SQLite migrations.
+- Explicit SQLite row-to-domain mapping.
+- The storm repository and local query boundaries.
+- Durable photo copying using Expo FileSystem.
+- Stable logical photo locators and current-container resolution.
+- Cleanup of an orphaned copied photo when database insertion fails.
+- Duplicate-submission protection.
+- Recoverable Save failure handling.
+- Storm Log refresh and navigation.
+- Storm detail, missing-record, and missing-photo states.
+- Focused persistence and component tests.
+
+Codex also helped diagnose an iOS application-container UUID change observed during device testing. The resulting correction replaced container-dependent absolute photo paths with stable logical locators, added migration handling for legacy values, and introduced regression coverage.
+
+### Offline behaviour and theming
+
+Codex assisted with:
+
+- The SQLite current-weather cache migration and data-access boundary.
+- Rounded-coordinate cache identity.
+- Live-weather cache updates and network-failure fallback.
+- NetInfo integration with TanStack Query’s online state.
+- Reconnect refresh behaviour.
+- Cached-weather, offline, and no-cache presentation.
+- Manual observed-condition guidance for offline documentation.
+- Complete system light/dark theme application.
+- Focused cache, reconnect, and theme-related tests.
+
+Offline cold-start, cached/no-cache behaviour, storm capture and persistence, reconnect refresh, and restart persistence were manually verified using locally compiled Release builds.
+
+### Weather forecast
+
+Codex assisted with:
+
+- A separate three-day Open-Meteo daily forecast request.
+- Explicit forecast transport and domain models.
+- Defensive mapping of Open-Meteo parallel daily arrays.
+- A compact accessible forecast component.
+- Loading, offline, malformed-response, failure, and retry states isolated from current weather.
+- Focused forecast mapping and component tests.
+
+### Stabilization and documentation
+
+Codex and ChatGPT assisted with:
+
+- Repository-wide source, test, dependency, and Git-diff review.
+- Identification of focused transport, offline-forecast, accessibility, and documentation gaps.
+- Accessibility labels, roles, form feedback, and screen-reader summaries.
+- README structure and wording.
+- AI usage disclosure.
+- Time-log reconciliation.
+- Manual-verification reporting.
+- Final verification and submission planning.
+
+## AI-Assisted Code
+
+Codex generated or substantially assisted code in the following areas:
+
+- Expo application configuration and provider composition
+- Expo Router navigation
+- Semantic theme tokens and light/dark mode support
+- Location and camera platform boundaries
+- Open-Meteo current-weather and forecast clients
+- Transport validation and domain mapping
+- TanStack Query hooks
+- React Hook Form storm metadata workflow
+- Storm draft orchestration and validation
+- SQLite initialization, migrations, repositories, and row mapping
+- Durable photo storage, resolution, and failure cleanup
+- Storm Save, Log, and detail workflows
+- Persistent current-weather caching and reconnect behaviour
+- Weather, forecast, offline, error, permission, and retry UI states
+- Focused Jest and React Native Testing Library tests
+
+The candidate selected and challenged the architecture, constrained milestone scope, reviewed generated code and diffs, manually exercised native workflows, identified implementation concerns, requested corrections, and made the final decisions about what to include or exclude.
+
+Record deletion, map visualization, cloud integration, authentication, background synchronization, radar, alerts, and multiple-photo support were not implemented.
+
+## Review and Validation
+
+AI-assisted work was reviewed against:
+
+- The original assessment requirements
+- Repository guidance in `AGENTS.md`
+- The locked architecture and milestone plan
+- Existing source code and tests
+- Git history and complete milestone diffs
+
+Automated validation included:
+
+```bash
+npm run typecheck
+npm run lint
+npm test -- --runInBand
+npx expo-doctor
+npm ls
+```
+
+Automated tests use mocked network, connectivity, SQLite, filesystem, camera, and location boundaries. They do not depend on live Open-Meteo responses or native end-to-end tooling.
+
+The candidate manually verified the core workflow matrix on:
+
+- iPhone 16 Pro Max running iOS 26
+- Honor 9X running Android 9 (API 28)
+
+Manual verification included locally compiled Release-build checks for offline cold starts, cached and no-cache weather states, offline storm documentation, restart persistence, durable photos, and reconnect refresh.
+
+A focused accessibility pass was also performed using VoiceOver on iOS and TalkBack on Android. Core navigation and the storm-documentation and Save workflow were operable within the tested scope; every permission, error, offline, and retry state was not exhaustively tested with assistive technology.

@@ -47,6 +47,11 @@ describe('offline weather presentation', () => {
     expect(
       screen.getByText(`Observed ${new Date(cachedWeather.observedAt).toLocaleString()}`),
     ).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText(
+        `Cached weather. Current condition: Thunderstorm. Observed ${new Date(cachedWeather.observedAt).toLocaleString()}`,
+      ),
+    ).toBeOnTheScreen();
   });
 
   it('explains the offline no-cache state and manual documentation fallback', () => {

@@ -34,6 +34,7 @@ export function StormClassificationField({
               const selected = value === stormType;
               return (
                 <Pressable
+                  accessibilityHint={errorMessage}
                   accessibilityLabel={stormTypeLabel(stormType)}
                   accessibilityRole="radio"
                   accessibilityState={{ checked: selected }}

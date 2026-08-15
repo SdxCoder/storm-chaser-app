@@ -93,6 +93,19 @@ describe('CaptureScreen', () => {
     });
   });
 
+  it('associates classification validation feedback with the radio group', async () => {
+    render(<CaptureScreen />);
+
+    fireEvent.changeText(screen.getByLabelText('Observed conditions'), 'Strong inflow');
+    fireEvent.press(screen.getByRole('button', { name: 'Save storm observation' }));
+
+    await screen.findByText('Select a storm classification.');
+    expect(screen.getByRole('radio', { name: 'Thunderstorm' })).toHaveProp(
+      'accessibilityHint',
+      'Select a storm classification.',
+    );
+  });
+
   it('allows manual observed conditions when API weather is unavailable', () => {
     mockUseStormDraft.mockReturnValue(
       stormDraftState({

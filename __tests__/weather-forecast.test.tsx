@@ -52,4 +52,20 @@ describe('WeatherForecast', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Retry forecast' }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
+
+  it('does not present in-memory forecast days as offline forecast support', () => {
+    render(
+      <WeatherForecast
+        days={[forecastDay]}
+        isLoading={false}
+        isOnline={false}
+        onRetry={jest.fn()}
+        unavailable={false}
+      />,
+    );
+
+    expect(screen.getByText('Forecast is unavailable offline.')).toBeOnTheScreen();
+    expect(screen.queryByText('Thunderstorm')).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Retry forecast' })).not.toBeOnTheScreen();
+  });
 });

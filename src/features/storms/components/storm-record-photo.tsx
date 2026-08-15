@@ -17,7 +17,9 @@ export function StormRecordPhoto({ photoUri }: { photoUri: string }) {
   if (resolvedPhotoUri === null || isMissing) {
     return (
       <View
-        accessibilityLabel="Saved storm photo is missing"
+        accessible
+        accessibilityLabel="Saved storm photo is missing. The storm metadata is still available."
+        accessibilityRole="image"
         style={[styles.missing, { backgroundColor: colors.surfaceElevated }]}
       >
         <Text accessibilityRole="alert" style={[styles.missingText, { color: colors.warning }]}>
@@ -29,7 +31,9 @@ export function StormRecordPhoto({ photoUri }: { photoUri: string }) {
 
   return (
     <Image
+      accessible
       accessibilityLabel="Saved storm photo"
+      accessibilityRole="image"
       onError={() => setIsMissing(true)}
       resizeMode="cover"
       source={{ uri: resolvedPhotoUri }}

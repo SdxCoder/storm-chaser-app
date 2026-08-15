@@ -58,7 +58,7 @@ describe('StormRecordPhoto', () => {
   it('renders a stable stored photo URI from the current app container', () => {
     render(<StormRecordPhoto photoUri="storm-photo://storm-test-123.jpg" />);
 
-    expect(screen.getByLabelText('Saved storm photo')).toHaveProp('source', {
+    expect(screen.getByRole('image', { name: 'Saved storm photo' })).toHaveProp('source', {
       uri: 'file:///current/documents/storm-photos/storm-test-123.jpg',
     });
   });
@@ -68,7 +68,7 @@ describe('StormRecordPhoto', () => {
 
     fireEvent(screen.getByLabelText('Saved storm photo'), 'error');
 
-    expect(screen.getByLabelText('Saved storm photo is missing')).toBeOnTheScreen();
+    expect(screen.getByRole('image', { name: /Saved storm photo is missing/ })).toBeOnTheScreen();
     expect(screen.getByText(/storm metadata is still available/)).toBeOnTheScreen();
   });
 
@@ -77,7 +77,7 @@ describe('StormRecordPhoto', () => {
 
     render(<StormRecordPhoto photoUri="storm-photo://../outside.jpg" />);
 
-    expect(screen.getByLabelText('Saved storm photo is missing')).toBeOnTheScreen();
+    expect(screen.getByRole('image', { name: /Saved storm photo is missing/ })).toBeOnTheScreen();
     expect(screen.queryByLabelText('Saved storm photo')).not.toBeOnTheScreen();
   });
 });
