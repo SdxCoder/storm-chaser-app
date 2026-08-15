@@ -13,6 +13,7 @@
 - Implemented the Milestone 2 foreground-location flow, Open-Meteo boundary, current-weather query, weather UI states, pull-to-refresh, and focused tests.
 - Confirmed the requested Open-Meteo current response shape and units with a live curl request using representative Calgary coordinates before defining the transport type.
 - Implemented the Milestone 3 temporary camera-capture workflow, local draft orchestration, React Hook Form metadata fields, immutable live-weather snapshot attachment, coordinate/accuracy capture, validation, accessible UI states, and focused tests.
+- Refined Milestone 3 by isolating the camera platform boundary, protecting recapture from superseded location results, and decomposing capture presentation into cohesive feature-local components without changing state ownership or persistence scope.
 - Assisted with Milestone 3 automated verification and scope review to keep durable photo storage and SQLite storm persistence excluded.
 
 ## AI-assisted code
