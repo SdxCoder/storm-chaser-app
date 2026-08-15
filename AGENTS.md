@@ -130,6 +130,7 @@ Run the smallest relevant test target during iteration, then the full required c
 - Do not create interfaces that only mirror one trivial implementation unless they enable a concrete test or boundary.
 - Do not refactor unrelated stable code while implementing a milestone.
 - Do not add a dependency without explaining its need and confirming the existing stack cannot solve the problem cleanly.
+- Prefer the narrowest ownership scope: keep one-off helpers colocated with the component or feature that owns their policy, and extract shared utilities only after genuine reuse with the same semantics.
 
 ## Working Rules
 
